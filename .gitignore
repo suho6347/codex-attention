@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.venv/
+logs/
+usage-watch/
+dist/
+artifacts/
+*.zip
+.env
+.env.*
+*.pem
+*.key
+auth.json
+config.local.*

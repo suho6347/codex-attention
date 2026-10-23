@@ -1,0 +1,11 @@
+{
+  "poll_seconds": 5,
+  "fast_seconds_per_percent": 600,
+  "release_seconds_per_percent": 800,
+  "history_seconds": 21600,
+  "stale_seconds": 120,
+  "edge_lease_seconds": 20,
+  "guard_poll_seconds": 3,
+  "status_seconds": 30,
+  "attribution_window_seconds": 300
+}
