@@ -7,6 +7,8 @@ Small Windows tools for making agent activity easier to notice:
 
 The quota watcher uses the attention renderer. You can use the blue attention tool by itself.
 
+Hover text uses an opaque background and native Windows text rendering. The helper opts into display DPI awareness and sizes its text and layout for the target monitor; it keeps click-through input and does not change Windows display settings.
+
 An unofficial, experimental utility. Windows 10/11, Windows PowerShell 5.1, and Python 3.10+ are required. The Python standard library is enough; there are no pip dependencies.
 
 ## Get started
@@ -115,7 +117,7 @@ See [INSTALL_FOR_AGENTS.md](INSTALL_FOR_AGENTS.md) and [AGENTS.example.md](AGENT
 powershell -NoProfile -STA -File .\test_attention_ui.ps1
 ```
 
-The tests use synthetic records and temporary directories. They cover detection, cached-value rebounds, quota resets, partial writes, Windows notifications, timer expiry, attribution, forks, and current sidebar titles. The UI check compiles the renderer and checks placement and focus protection without showing real test alerts.
+The tests use synthetic records and temporary directories. They cover detection, cached-value rebounds, quota resets, partial writes, Windows notifications, timer expiry, attribution, forks, and current sidebar titles. The UI check compiles the renderer and checks placement, opaque text, actual click-through window styles, and 100/125/150/200% display layouts without showing real test alerts.
 
 ## License
 

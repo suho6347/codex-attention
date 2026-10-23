@@ -2,6 +2,7 @@
 $ErrorActionPreference = 'Stop'
 if ($ValidateOnly) {
     Add-Type -ReferencedAssemblies System.Windows.Forms,System.Drawing -Path (Join-Path $PSScriptRoot 'attention_ui.cs')
+    [FeDisplay]::EnableDpiAwareness()
     return
 }
 if ([string]::IsNullOrWhiteSpace($RequestPath)) { throw 'RequestPath is required' }
@@ -54,6 +55,7 @@ Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 $edgeColor = if ($isAlarm) { [System.Drawing.Color]::FromArgb(255, 40, 40) } else { [System.Drawing.Color]::FromArgb(0, 180, 255) }
 Add-Type -ReferencedAssemblies System.Windows.Forms,System.Drawing -Path (Join-Path $PSScriptRoot 'attention_ui.cs')
+[FeDisplay]::EnableDpiAwareness()
 $edges = New-Object 'System.Collections.Generic.List[System.Windows.Forms.Form]'
 $icon = New-Object System.Windows.Forms.NotifyIcon
 $timer = New-Object System.Windows.Forms.Timer
