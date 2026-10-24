@@ -3,6 +3,7 @@ __pycache__/
 .venv/
 logs/
 usage-watch/
+dashboard-state/
 dist/
 artifacts/
 *.zip

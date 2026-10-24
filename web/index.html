@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Codex Attention · 로컬 모니터</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/dashboard.css">
+  <script src="/dashboard.js" defer></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="/" aria-label="Codex Attention 홈"><span class="brand-icon">c<span>·</span></span><span>codex<span class="brand-sub">ATTENTION</span></span></a>
+    <div class="nav-caption">WORKSPACE</div>
+    <a class="nav-item active" href="#main"><span aria-hidden="true">◫</span> 채팅 현황 <span class="nav-live"></span></a>
+    <a class="nav-item" href="#quota-panel"><span aria-hidden="true">◴</span> 사용량 신호</a>
+    <a class="nav-item" href="#attention-panel"><span aria-hidden="true">◉</span> 알림 기록</a>
+    <div class="sidebar-bottom"><span class="local-label"><span class="dot green"></span> 이 PC에서만 실행</span><p>로컬 기록을 읽기 전용으로<br>확인합니다.</p><span class="sidebar-version">CODEX ATTENTION / LOCAL</span></div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar"><div class="breadcrumb">내 워크스페이스 <span>/</span> <strong>채팅 현황</strong></div><div class="header-signals"><button id="header-signal" class="header-signal" aria-label="사용량 신호 상세로 이동"><span class="dot gray"></span><span>사용량 관측 중</span></button><div class="connection" id="connection" role="status"><span class="dot gray"></span><span>연결 중</span></div></div></header>
+    <main id="main">
+      <div class="page-heading"><div><div class="eyebrow">LOCAL ACTIVITY MONITOR</div><h1>채팅 현황<span class="heading-dot">.</span></h1><p>여러 채팅의 진행 상황을 한눈에. 변화가 생기면 바로 업데이트됩니다.</p></div><div class="page-meta"><span id="today"></span><span class="refresh-caption" id="last-checked">로컬 기록을 연결하고 있습니다</span></div></div>
+      <div id="source-warning" class="notice" role="status" hidden></div>
+      <section class="summary" aria-label="채팅 상태 요약">
+        <button class="summary-card selected" data-state="all" aria-pressed="true"><span class="summary-label">전체 채팅 <span class="summary-symbol">◫</span></span><strong id="count-all">—</strong><span class="summary-foot">이 PC의 로컬 채팅</span></button>
+        <button class="summary-card" data-state="running" aria-pressed="false"><span class="summary-label">진행 중 <span class="dot green glow"></span></span><strong id="count-running">—</strong><span class="summary-foot">생각 · 응답 · 도구 실행</span></button>
+        <button class="summary-card" data-state="waiting" aria-pressed="false"><span class="summary-label">확인 대기 <span class="dot amber glow"></span></span><strong id="count-waiting">—</strong><span class="summary-foot">사용자 입력이 필요해요</span></button>
+        <button class="summary-card" data-state="completed" aria-pressed="false"><span class="summary-label">응답 완료 <span class="dot blue"></span></span><strong id="count-completed">—</strong><span class="summary-foot">마지막 응답이 완료된 채팅</span></button>
+      </section>
+      <div class="dashboard-grid">
+        <section class="panel chats-panel" aria-labelledby="chats-heading">
+          <div class="panel-heading"><h2 id="chats-heading">내 채팅 <span id="visible-count" class="count-badge">0</span></h2><label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="채팅, 프로젝트, 모델 검색" aria-label="채팅 검색" autocomplete="off"></label></div>
+          <div class="filterbar"><div class="filters" role="group" aria-label="상태 필터"><button class="filter selected" data-state="all" aria-pressed="true">전체</button><button class="filter" data-state="running" aria-pressed="false">진행 중</button><button class="filter" data-state="waiting" aria-pressed="false">확인 대기</button><button class="filter" data-state="completed" aria-pressed="false">완료</button><button class="filter" data-state="attention" aria-pressed="false">점검 필요</button></div><select id="sort" aria-label="정렬"><option value="recent">최근 활동순</option><option value="status">진행 상태순</option><option value="title">제목순</option></select></div>
+          <div class="list-options"><span><span class="dot green small"></span> 상태 버튼을 눌러 상세 기록 확인</span><div><label><input id="show-agents" type="checkbox"> 하위 에이전트</label><label><input id="show-archived" type="checkbox"> 보관된 채팅</label></div></div>
+          <div class="table-wrap"><table><thead><tr><th scope="col">채팅 / 프로젝트</th><th scope="col">상태</th><th scope="col">모델</th><th scope="col" class="tokens-col" title="누적 입력 + 출력 토큰. 캐시 입력은 입력 토큰에 포함됩니다.">사용된 누적 토큰 수</th><th scope="col" class="time-col">최근 활동</th></tr></thead><tbody id="chat-list"></tbody></table></div>
+          <div id="empty" class="empty" hidden><span class="empty-icon">◌</span><h3>표시할 채팅이 없습니다</h3><p id="empty-description">검색어나 상태 필터를 바꿔 보세요.</p><button id="reset-filters" class="secondary-button">필터 초기화</button></div>
+          <div id="loading" class="empty"><span class="empty-icon">◌</span><p>로컬 채팅 기록을 읽고 있습니다…</p></div>
+          <div class="table-footer"><span id="table-note">메시지 본문 없이 상태 메타데이터만 표시합니다.</span><span id="file-count"></span></div>
+        </section>
+        <aside class="right-column">
+          <section class="panel quota-panel" id="quota-panel" aria-labelledby="quota-heading">
+            <div class="panel-heading"><h2 id="quota-heading">사용량 신호</h2><span class="tiny-label">ACCOUNT</span></div>
+            <button id="quota-signal" class="signal-button gray" aria-expanded="false" aria-controls="signal-explanation"><span class="signal-lamp"></span><span><strong id="signal-title">기록 확인 중</strong><span id="signal-caption">로컬 할당량 기록을 기다립니다</span></span><span class="signal-chevron" aria-hidden="true">⌄</span></button>
+            <p id="signal-explanation" class="signal-explanation" hidden>불빛은 이 페이지 안에서만 표시됩니다. 빨강은 빠른 소모, 초록은 정상 범위, 회색은 관측 중이거나 오래된 기록입니다. 빨강 진입 기준은 약 10분에 1%이며, 약 13분 20초에 1% 이하로 느려지면 해제됩니다.</p>
+            <div id="quota-list" class="quota-list"></div>
+            <p class="panel-note">계정 전체 할당량의 로컬 관측값입니다.<br>새 기록이 없으면 마지막 확인 시간을 표시합니다.</p>
+          </section>
+          <section class="panel attribution-panel" aria-labelledby="attribution-heading"><div class="panel-heading"><h2 id="attribution-heading">최근 사용 비중</h2><span class="tiny-label">5 MIN</span></div><div id="attribution-list"></div><p id="attribution-note" class="panel-note">이 PC의 최근 기록을 비교합니다.<br>실제 구독 할당량 배분과 다를 수 있습니다.</p></section>
+          <section class="panel" id="attention-panel" aria-labelledby="attention-heading"><div class="panel-heading"><h2 id="attention-heading">알림 기록</h2><span class="tiny-label">ATTENTION</span></div><div id="attention-list"><p class="muted-empty">아직 알림 기록이 없습니다.</p></div><div class="quiet-mode"><span class="dot green small"></span> 화면 테두리 없이 웹에서 확인</div></section>
+        </aside>
+      </div>
+      <footer class="page-footer"><span>LOCAL DATA. LIVE SIGNALS.</span><span id="source-description">Python 표준 라이브러리 · 외부 전송 없음</span></footer>
+    </main>
+  </div>
+  <dialog id="chat-detail" aria-labelledby="detail-title"><div class="detail-top"><span class="eyebrow">CHAT DETAILS</span><button id="close-detail" class="icon-button" aria-label="상세 닫기">×</button></div><h2 id="detail-title"></h2><div id="detail-body"></div><div class="detail-footer"><button id="copy-id" class="secondary-button">채팅 ID 복사</button><span id="copy-feedback" role="status"></span></div></dialog>
+</body>
+</html>

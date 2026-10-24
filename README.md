@@ -7,6 +7,64 @@ Small Windows tools for making agent activity easier to notice:
 
 The quota watcher uses the attention renderer. You can use the blue attention tool by itself.
 
+## Local web dashboard (이 브랜치의 로컬 웹 모니터)
+
+화면 테두리 대신 로컬 웹의 **상태 버튼 불빛**으로 채팅과 사용량을 확인할 수 있습니다.
+Python 표준 라이브러리만 사용하며, 프런트엔드는 `web/`의 HTML/CSS/JavaScript입니다.
+
+**더블클릭 실행:** [`exec/Open-Codex-Dashboard.cmd`](exec/Open-Codex-Dashboard.cmd)를
+열면 웹 서버를 백그라운드에서 시작하고 기본 브라우저에 대시보드를 엽니다.
+이미 실행 중이면 기존 서버를 사용해 페이지만 엽니다. 어느 폴더에서 실행해도 됩니다.
+
+```powershell
+# 기존 화면 테두리 감시기를 중지하고 자동 재시작도 일시정지
+.\codex-usage-watch.cmd stop
+
+# 백그라운드 실행 + 기본 브라우저에서 열기
+.\codex-dashboard.cmd start --open
+
+# 실행 상태 / 종료
+.\codex-dashboard.cmd status
+.\codex-dashboard.cmd stop
+```
+
+주소: **http://127.0.0.1:8765**. 터미널에서 직접 실행하려면
+`.\codex-dashboard.cmd run`, 다른 포트는 `--port 8766`, Codex 기록 경로는
+`--home "D:\path\to\.codex"`로 지정합니다. 종료할 때도 같은 `--port`를 사용하세요.
+Windows 시작 작업이나 서비스를 추가하지 않으며, 한 포트에서 중복 실행하지 않습니다.
+
+- 채팅의 진행 중 / 확인 대기 / 응답 완료 / 중단 / 오류 / 기록 지연 상태를 표시합니다.
+- 채팅 제목, 프로젝트, 모델 검색과 상태 필터, 정렬, 하위 에이전트·보관된 채팅 표시를 지원합니다.
+- 목록의 **사용된 누적 토큰 수**는 누적 입력 + 출력 합계입니다. 캐시 입력·추론 출력은 중복 합산하지 않습니다.
+  세션에 토큰 기록이 없으면 로컬 DB의 누적값을 사용하고, 어느 쪽에도 없으면 `—`로 표시합니다.
+- 상태 버튼을 누르면 작업 시각, 토큰 수, 최근 상태 기록, 복사 가능한 채팅 ID가 나옵니다.
+- 사용량 신호 버튼은 빠른 소모에 **빨강**, 정상 범위에 **초록**, 관측 중·오래된 기록에 **회색**으로 켜집니다.
+  버튼을 누르면 판단 기준을 펼칩니다. 판정 설정은 기존 `usage-watch-config.json`을 사용합니다.
+- 할당량 잔여 비율, 최근 5분간 로컬 사용 비중, 기존 Attention 알림 내역을 함께 표시합니다.
+- 기본 1초마다 파일 추가분을 읽고 SSE로 웹에 전달합니다. 새 채팅·이름 변경은 최대 약 5초 후 반영합니다.
+  연결이 끊기면 재접속하며, SSE를 사용할 수 없으면 5초 폴링으로 전환합니다.
+
+웹 서버는 `127.0.0.1`에서만 열리고 외부 요청·다른 웹사이트의 교차 출처 요청은 차단합니다.
+화면 테두리, 소리, Windows 알림을 실행하지 않습니다. 기존 테두리 감시기를 별도로 다시 시작하면
+그 감시기의 화면 알림은 다시 작동합니다. `stop`으로 설정한 일시정지는 `start` 전까지 유지됩니다.
+
+상태는 이 PC의 **로컬 기록을 바탕으로 한 관측값**입니다. 앱 내부 상태 API와 직접 연결하지 않으므로,
+원격에서만 실행되는 채팅이나 기록에 나타나지 않는 승인 대기는 확인할 수 없습니다.
+진행 기록이 3분 이상 끊기면 완료로 추측하지 않고 `기록 지연`으로 표시합니다
+(`--stale-seconds`로 조정). 큰 세션은 시작 시 마지막 1 MiB만 읽으며, 앞선 기록이 생략될 수 있습니다.
+DB 메타데이터는 최신 500개까지 읽고, 로컬 세션에서 발견한 채팅도 함께 표시합니다.
+사용 비중은 이 범위 안에서 관측된 최근 이벤트의 추정치입니다.
+
+채팅 본문·도구 인수·도구 출력은 웹 API에 포함하거나 별도로 저장하지 않습니다.
+채팅 제목·프로젝트 경로와 기존 알림 문구는 브라우저에 표시되므로 화면 공유 시 참고하세요.
+인증정보를 읽지 않습니다. 실행 상태는 Git에서 제외된 `dashboard-state/`에 저장됩니다.
+
+검증:
+
+```powershell
+.\run-python.cmd -m unittest -v test_codex_dashboard test_codex_usage_watch test_usage_attribution
+```
+
 Hover text uses an opaque background and native Windows text rendering. The helper opts into display DPI awareness and sizes its text and layout for the target monitor; it keeps click-through input and does not change Windows display settings.
 
 An unofficial, experimental utility. Windows 10/11, Windows PowerShell 5.1, and Python 3.10+ are required. The Python standard library is enough; there are no pip dependencies.
